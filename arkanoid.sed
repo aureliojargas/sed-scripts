@@ -305,7 +305,7 @@ y/RLUD/rlud/
 # hold ball, no move
 /o.\{20\}~/b end
 
-### LET´S MOVE IT!
+### LET'S MOVE IT!
 
 # reached top: do bounce changing Y-direction
 /_\(.\{20\}\)o/y/u/d/
