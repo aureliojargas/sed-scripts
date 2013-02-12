@@ -24,7 +24,7 @@
 # ANTI-FLAME DISCLAIMER:
 #   Well, just as sokoban.sed, this one is cool because it's sed.
 #   It's not funny to play or even exciting, because keep pressing
-#   ENTER to the ball move sucks. But hey, it's cute! &;) 
+#   ENTER to the ball move sucks. But hey, it's cute! &;)
 #
 # For the how-many-lines-it-has? fanatics:
 #   prompt$ sed '/^ *#/d' arkanoid.sed | sed '$=;d'
@@ -348,7 +348,7 @@ b boom
 #   | = | * |   0. free Y-way
 #   |o= | = |   1. explode and change X-direction           (left-up)
 #   +---+---+
-#   
+#
 ### RIGHT-UP Smart clockwise full round explosion!
 #
 #   +---+---+---+---+---+
@@ -375,14 +375,14 @@ b boom
     /Rd $/s/ $/</
     /Lu $/s/ $/</
     y/ud/du/
-  }	
+  }
   /!/{
     /Ld $/s/ $/</
     /Ru $/s/ $/</
     /Rd $/s/ $/>/
     /Lu $/s/ $/>/
     y/RL/LR/
-  }	
+  }
   y/ud/UD/
   b end
 
