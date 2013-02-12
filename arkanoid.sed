@@ -29,10 +29,10 @@
 # For the how-many-lines-it-has? fanatics:
 #   prompt$ sed '/^ *#/d' arkanoid.sed | sed '$=;d'
 #
-# Tip: Use hold mode and hit the paddle twice on the walli
+# Tip: Use hold mode and hit the paddle twice on the wall
 #      to escape cyclic ball movement
 #
-# TODO Get classic arkanoid levels (somebody help me!)
+# TODO Get classic Arkanoid levels (somebody help me!)
 #
 # Changelog:
 # - 2002-07-09 v1.0: Debut release
@@ -255,7 +255,7 @@ x
 
 /q/q
 
-# you cheater! (keep holding enter - hyperspeed)
+# you cheater! (keep holding enter - hyper-speed)
 /#/{
   x
   /#/!s/\(.*\)|/\1#/
@@ -302,7 +302,7 @@ s/\*/o/
 # reset movements
 y/RLUD/rlud/
 
-# holded ball, no move
+# hold ball, no move
 /o.\{20\}~/b end
 
 ### LET´S MOVE IT!
