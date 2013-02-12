@@ -34,10 +34,11 @@
 #
 # TODO Get classic Arkanoid levels (somebody help me!)
 #
-# Changelog:
-# - 2002-07-09 v1.0: Debut release
-# - 2005-05-13 v1.1: Now it's a sedcheck compliant script.
-#                    It will run on most SED's, including oldies
+# CHANGELOG:
+#   2002-07-09 v1.0: Debut release
+#   2005-05-13 v1.1: Now it's a sedcheck compliant script.
+#                    It will run on most SED's, including oldies.
+#   2013-02-12 v1.2: Removed ISO-8859-1 char, now we're plain ASCII.
 
 b zero
 
