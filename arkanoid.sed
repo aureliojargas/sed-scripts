@@ -1,8 +1,8 @@
 #!/bin/sed -nf
-# arkanoid.sed - 20020709 - http://sed.sf.net/sedgames
-#   by aurélio marinho jargas <aurelio@verde666.org>
+# arkanoid.sed - http://aurelio.net/bin/sed/arkanoid/
+#   by Aurelio Marinho Jargas <verde (a) aurelio net>
 #
-# arkanoid: a paddle that bounces a ball (pong!) to destroy blocks
+# Arkanoid: a paddle that bounces a ball (pong!) to destroy blocks
 #
 # ACTORS:
 #   o  ball               --  paddle
@@ -12,17 +12,32 @@
 # COMMANDS:
 #   z  left move      c  hold mode ON/OFF
 #   x  right move     q  quit
-#   
-# ANTI-FLAME DISCLAIMER:
-#   well, just as sokoban.sed, this one is cool because it's sed.
-#   it's not funny to play or even exciting, because keep pressing
-#   ENTER to the ball move sucks. but hey, it's cute! &;) 
 #
-# for the how-many-lines-it-has? fanatics:
+# HOW TO PLAY:
+#   You must press the ENTER key after *every* command. Start the
+#   program with "sed -f arkanoid.sed". Press ENTER. Choose the
+#   level. Press ENTER. Move the paddle with the keyboard arrows
+#   or with the Z and X keys. Press ENTER. Release the ball using
+#   the down arrow ou the C key. Press ENTER. Press ENTER. Press
+#   ENTER. Press ENTER...
+#
+# ANTI-FLAME DISCLAIMER:
+#   Well, just as sokoban.sed, this one is cool because it's sed.
+#   It's not funny to play or even exciting, because keep pressing
+#   ENTER to the ball move sucks. But hey, it's cute! &;) 
+#
+# For the how-many-lines-it-has? fanatics:
 #   prompt$ sed '/^ *#/d' arkanoid.sed | sed '$=;d'
 #
-# tip: use hold mode to escape circle ball movement
-# TODO get classic arkanoid levels (somebody help me!)
+# Tip: Use hold mode and hit the paddle twice on the walli
+#      to escape cyclic ball movement
+#
+# TODO Get classic arkanoid levels (somebody help me!)
+#
+# Changelog:
+# - 2002-07-09 v1.0: Debut release
+# - 2005-05-13 v1.1: Now it's a sedcheck compliant script.
+#                    It will run on most SED's, including oldies
 
 b zero
 
@@ -31,13 +46,18 @@ b zero
   #s/K(\([0-9;]*\))//g
   b showmap
 
-:parsecomm
+:parsecmd
   ### arrow keys (1), numeric pad (2), i-case (3), wipe trash(4)
-  //{ s/\[A/h/g ; s/\[B/h/g ; s/\[C/x/g ; s/\[D/z/g ; }
+  //{
+    s/\[A/h/g
+    s/\[B/h/g
+    s/\[C/x/g
+    s/\[D/z/g
+  }
   y/4560/zhxq/
   y/QZXHCc/qzxhhh/
   s/[^qzxh#]//g
-  b execcomm
+  b execcmd
 
 :welcome
   i\
@@ -50,7 +70,8 @@ b zero
   ### clear screen, show help
   i\
   [2J[H
-  x; s|.*|\
+  x
+  s|.*|\
   ...                  Sed Arkanoid\
   ...                  \
   ...                    z,4,<left>   left move\
@@ -59,8 +80,9 @@ b zero
   ...                    q,0          quit game\
   ...                    <enter>      go!\
   \
-                           http://sed.sf.net/sedgames|p
-  s/.*//;x
+  |p
+  s/.*//
+  x
   b end
 
 
@@ -80,7 +102,8 @@ b zero
      |      o      |\
      |     ~~      |\
      |...__________|\
-  / ; b endmap
+  /
+  b endmap
   }
   /^2$/{ s/.*/\
       _____________ \
@@ -96,7 +119,8 @@ b zero
      |      o      |\
      |     ~~      |\
      |...__________|\
-  / ; b endmap
+  /
+  b endmap
   }
 
   ### test levels
@@ -110,7 +134,8 @@ b zero
      |       = = = |\
      |             |\
      |.____________|\
-   / ; b endmap
+  /
+  b endmap
   }
   # free Y test
   /^t2$/{ s/.*/\
@@ -124,7 +149,8 @@ b zero
      |  ==         |\
      |             |\
      |____.________|\
-   / ; b endmap
+  /
+  b endmap
   }
   # tri-explosion test
   /^t3$/{ s/.*/\
@@ -138,7 +164,8 @@ b zero
      |  ==         |\
      |             |\
      |.____________|\
-   / ; b endmap
+  /
+  b endmap
   }
   # round explosion test
   /^t4$/{ s/.*/\
@@ -150,12 +177,18 @@ b zero
      |    == ==    |\
      |             |\
      |___________._|\
-   / ; b endmap
+  /
+  b endmap
   }
-  /~~/!{s/.*/there is no '&' level!/p ;q;}
+  /~~/!{
+    s/.*/there is no '&' level!/p
+    q
+  }
 
 :endmap
-  s/^/[H/ ; s/  $/ru / ; h
+  s/^/[H/
+  s/  $/ru /
+  h
   b showhelp
 
 #--------------------------------------------------------------------
@@ -188,12 +221,13 @@ b zero
 # - user commands are case insensitive
 
 
-# missedball routine: 1. reset direction and explosion status
+# ballmiss routine: 1. reset direction and explosion status
 # 2. put ball over paddle , 3. take one life, 4. put paddle on hold mode
 #
-:missedball
+:ballmiss
   s/...$/ru /
-  s/\*/ / ; s/ \(.\{20\}\)\([-~]\)/o\1\2/
+  s/\*/ /
+  s/ \(.\{20\}\)\([-~]\)/o\1\2/
   s/\._/__/
   s/--/~~/
   b end
@@ -204,41 +238,55 @@ b zero
 # first map loading
 2 b loadmap
 
-:ini
-b parsecomm
+b parsecmd
 
-:execcomm
+:execcmd
 ### execute user commands
 
 ### first, have you missed a ball?
-x ; /\*\(.\{20\}\)[_.]/{
-  /#/! b missedball
+x
+/\*\(.\{20\}\)[_.]/{
+  /#/!b ballmiss
   # cheat mode: never loses
-  y/d*/uo/ ; b execcomm
-} ; x
+  y/d*/uo/
+  b execcmd
+}
+x
 
 /q/q
 
 # you cheater! (keep holding enter - hyperspeed)
-/#/{ x ; /#/!s/\(.*\)|/\1\#/ ; }
+/#/{
+  x
+  /#/!s/\(.*\)|/\1#/
+}
 
 # 1. move ball+paddle on hold, and goto end
 # 2. move just paddle and continue
 /z/{ x
-  /o.\{20\}~/{ s/ o/o / ; s/ ~~/~~ / ; b end
+  /o.\{20\}~/{
+    s/ o/o /
+    s/ ~~/~~ /
+    b end
   }
-  s/ \(--\|~~\)/\1 /
+  s/ --/-- /
+  s/ ~~/~~ /
 }
 /x/{ x
-  /o.\{20\}~/{ s/o / o/ ; s/~~ / ~~/ ; b end
+  /o.\{20\}~/{
+    s/o / o/
+    s/~~ / ~~/
+    b end
   }
-  s/\(--\|~~\) / \1/
+  s/-- / --/
+  s/~~ / ~~/
 }
-/h/{ x;
+/h/{ x
   ### turn OFF hold mode routine
   /~~/{
     # depending which side of paddle, change X-direction
-    /o.\{20\}~~/y/Rr/LL/ ; /o.\{20\}~[^~]/y/Ll/RR/
+    /o.\{20\}~~/y/Rr/LL/
+    /o.\{20\}~[^~]/y/Ll/RR/
     # change Y-direction
     /o.\{20\}~/y/Dd/UU/
   }
@@ -271,13 +319,19 @@ y/RLUD/rlud/
 /l/s/ o/O /
 
 # tricky move over a block - part I
-/r/{ s/o=/ @/ ; s/% /=o/ ; }
-/l/{ s/=o/@ / ; s/ %/o=/ ; }
+/r/{
+  s/o=/ @/
+  s/% /=o/
+}
+/l/{
+  s/=o/@ /
+  s/ %/o=/
+}
 
 # restore ball and mark X moves as done
 y/O@rl/o%RL/
 
-b explodeme
+b boom
 
 
 ### detect block. if so, explode it!
@@ -305,11 +359,11 @@ b explodeme
 #
 
 ### explosion functions (wise is clockwise [>] or anti-clockwise [<])
-# detectwise: if wise direction is empty, set it! - else dowise
-#    setwise: set wise direction, based on current ball direction
-#     dowise: set the next ball direction, based on wise direction
+# chkwise: if wise direction is empty, set it! - else dowise
+# setwise: set wise direction, based on current ball direction
+#  dowise: set the next ball direction, based on wise direction
 #
-:detectwise
+:chkwise
   / $/ b setwise
   b dowise
 
@@ -350,7 +404,7 @@ b explodeme
 #   3. blocked XY from right (tri-explosion)
 #   4. free Y
 #
-:explodeme
+:boom
 /d/{
   /o\(.\{20\}\)=/         s// \1*/
   /% \(.\{19\}\)==\(.*L\)/s//*o\1**\2/
@@ -361,16 +415,18 @@ b explodeme
   /=\(.\{20\}\)o/         s//*\1 /
   /==\(.\{19\}\)% \(.*L\)/s//**\1*o\2/
   /==\(.\{19\}\) %\(.*R\)/s//**\1o*\2/
-  /=\(.\{20\}\)%/         s//!\1=/ 
+  /=\(.\{20\}\)%/         s//!\1=/
 }
 
 # end tri-explosion: invert all directions (keep before "end free X" code)
-/\*\*/{ y/udRL/DULR/ ; b end
+/\*\*/{ y/udRL/DULR/
+ b end
 }
 # end free Y explosion
-/! .*L\| !.*R/ b detectwise
+/! .*L/ b chkwise
+/ !.*R/ b chkwise
 # end free X explosion
-/\*/ b detectwise
+/\*/ b chkwise
 
 
 # detect paddle bounce, change Y-direction
@@ -395,8 +451,8 @@ y/!/*/
 /\*/!s/[<>]$/ /
 
 ### detect level finished or GAME OVER
-/=/!{ s/\(\([^\n]*\n\)\{5\}[^|]*|\).........../\1K(33;1)  VICTORY!!K()/ ; }
-/\./!{ s/\(\([^\n]*\n\)\{5\}[^|]*|\).........../\1K(31;1)  GAME OVERK()/ ; }
+/=/!s/\(\([^\n]*\n\)\{5\}[^|]*|\).........../\1K(33;1)  VICTORY!!K()/
+/\./!s/\(\([^\n]*\n\)\{5\}[^|]*|\).........../\1K(31;1)  GAME OVERK()/
 
 ### save map
 h
@@ -408,14 +464,17 @@ s/...$//
 s/--/K(32;1)&K()/g
 s/~~/K(32;1)&K()/g
 s/o/K(33;1)&K()/g
-s/ \?_\+ \?\||/K(42;32)&K()/g
+s/ \{0,1\}_\{1,\} \{0,1\}/K(42;32)&K()/g
+s/|/K(42;32)&K()/g
 s/\./K(42;32;1)&K()/g
 s/#/K(42;37;1)&K()/g
 s/\*/K(31;1)&K()/g
 b nocolor
 
 :showmap
-s/K(\([0-9;]*\))/[\1m/g ; p
+s/K(\([0-9;]*\))/[\1m/g
+p
 
-/VICT\|OVER/q
+/VICT/q
+/OVER/q
 d
